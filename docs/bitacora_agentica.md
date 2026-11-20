@@ -92,3 +92,14 @@
 - **Verificación visual humana (`clasificador_ojos_cnn.png`):** Cuatro paneles legibles (`2700 x 630`) con encabezado explícito de demostración sintética; matrices de confusión diagonales (`150/150` en ambos métodos), curvas ROC superpuestas en `AUC=1.000` y descenso continuo de la pérdida a lo largo de las 10 épocas.
 - **Interpretación metodológica:** En datos sintéticos limpios ambos métodos separan perfectamente las clases (`diferencia +0.000`), lo que valida el flujo de entrenamiento y comparación pero **no constituye evidencia de desempeño real** bajo variaciones de iluminación, oclusión o cámara infrarroja; se conserva `ear` como método activo hasta evaluar con un dataset real etiquetado.
 - **Validación:** Hashes SHA256 idénticos entre corridas consecutivas y `46 passed` en `pytest`.
+
+## Fase 7: Consolidación del informe técnico final (`@driveguard-informe`)
+
+- **Artefacto generado:** `resultados/informe_tecnico_final.md`, integrando la matriz de reproducibilidad (semilla `42`), métricas, tablas y enlaces a los artefactos de todas las fases previas.
+- **Síntesis de resultados del laboratorio:**
+  - **Entorno y pruebas:** Diagnóstico sin errores bloqueantes y `46 passed` en `pytest` a lo largo de todas las fases.
+  - **Motor de riesgo (`core/riesgo.py`):** Los 7 escenarios sintéticos y la prueba sobre video dispararon los niveles `NORMAL`, `MEDIO`, `ALTO` y `emergencia` en los tiempos esperados.
+  - **Calibración de umbrales:** El barrido de sensibilidad confirmó que los 5 valores por defecto de `ConfigRiesgo` (`factor_ear=0.75`, `perclos_umbral=30%`, `microsueno_s=1.5s`, `sin_respuesta_s=10s`, `histeresis_s=2s`) logran 100 % de detección con 0 s de falsas alarmas.
+  - **Desempeño en tiempo real:** El pipeline alcanzó `~53,7 FPS` de procesamiento (`48,9 FPS` de flujo) con latencia media de `18,6 ms` (`p95 = 26,2 ms`), ejecutando MediaPipe `FaceLandmarker` real sobre los 750 fotogramas.
+  - **Clasificador CNN vs. EAR:** En la demostración sintética (`SYNTHETIC`), ambos métodos obtuvieron `F1 = 1.000` y `ROC AUC = 1.000` (`Δ = 0.000`), por lo que se mantiene `OJOS_METODO=ear` hasta validar con un dataset real etiquetado.
+- **Limitaciones documentadas:** Evaluación basada en escenarios sintéticos y video controlado (sin variaciones reales de iluminación, oclusión ni cámaras IR), lo que delimita el sistema como prototipo académico reproducible.
