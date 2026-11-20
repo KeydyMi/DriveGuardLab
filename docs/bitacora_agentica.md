@@ -80,3 +80,15 @@
 - **Detecciones registradas:** `microsueno` a los `17,53 s` (`ALTO`, 3,6 s), `bostezos` a los `38,00 s` (`MEDIO`, 12,0 s) y `rostro_ausente` a los `44,00 s` (`MEDIO`, 3,0 s). Nivel máximo `ALTO`, sin emergencia.
 - **Verificación visual humana (`evaluacion_video.png`):** Gráfica libre de rostros; muestra con claridad el ajuste del umbral EAR tras la calibración de 10 s, la transición a `ALTO` en el microsueño, los 3 picos de MAR y el estado `MEDIO` durante bostezos y ausencia de rostro, además de la distribución de latencia (`p50 = 19,1 ms`, `p95 = 26,2 ms`). Se observó que los tres paneles comparten el eje X (`0–60`) combinando segundos arriba y milisegundos en el histograma inferior.
 - **Validación:** Verificado con `git check-ignore` que ningún `.mp4` entra al repositorio; `pytest` en verde (`46 passed`).
+
+## Fase 6: Clasificador CNN de ojos frente a EAR (`@driveguard-cnn`)
+
+- **Autorización y control de entorno:** Ante la ausencia de imágenes reales en `data/ojos/` y de pesos preentrenados en `models/cnn_ojos.pt`, se autorizó explícitamente la ejecución en modo demostración sintética (`SYNTHETIC`) manteniendo `OJOS_METODO=ear` y sin modificar `.env` ni `ConfigRiesgo`.
+- **Script implementado:** `scripts/experimentos/clasificador_ojos_cnn.py` (con soporte `--semilla`, `--dataset`, `--salida` y compatibilidad futura para `--dataset local --ear-csv ...`). Genera los recortes en memoria, entrena `crear_cnn()` de `core/ojos_cnn.py` durante 10 épocas y compara contra el umbral EAR (`0.21`).
+- **Artefactos generados:** `resultados/clasificador_ojos_cnn.csv`, `resultados/clasificador_ojos_cnn_predicciones.csv`, `resultados/clasificador_ojos_cnn.md` y `resultados/clasificador_ojos_cnn.png` (sin guardar imágenes de ojos/rostros ni pesos en `models/`).
+- **Resultados comparativos (`SYNTHETIC`, 300 muestras de prueba, semilla 42):**
+  - **EAR (`umbral = 0.21`):** F1 cerrado `1.000`, F1 macro `1.000`, ROC AUC `1.000` (`TP=150, TN=150, FP=0, FN=0`).
+  - **CNN (`P(cerrado) > 0.5`):** F1 cerrado `1.000`, F1 macro `1.000`, ROC AUC `1.000` (`TP=150, TN=150, FP=0, FN=0`), con pérdida de entrenamiento descendente de `0.413` a `0.014`.
+- **Verificación visual humana (`clasificador_ojos_cnn.png`):** Cuatro paneles legibles (`2700 x 630`) con encabezado explícito de demostración sintética; matrices de confusión diagonales (`150/150` en ambos métodos), curvas ROC superpuestas en `AUC=1.000` y descenso continuo de la pérdida a lo largo de las 10 épocas.
+- **Interpretación metodológica:** En datos sintéticos limpios ambos métodos separan perfectamente las clases (`diferencia +0.000`), lo que valida el flujo de entrenamiento y comparación pero **no constituye evidencia de desempeño real** bajo variaciones de iluminación, oclusión o cámara infrarroja; se conserva `ear` como método activo hasta evaluar con un dataset real etiquetado.
+- **Validación:** Hashes SHA256 idénticos entre corridas consecutivas y `46 passed` en `pytest`.

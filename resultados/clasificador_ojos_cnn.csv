@@ -1,0 +1,3 @@
+﻿metodo,origen,semilla,n_prueba,umbral,exactitud,precision_cerrado,sensibilidad_cerrado,f1_cerrado,f1_macro,roc_auc,tp,tn,fp,fn
+EAR,SINTÉTICO (demo: no válido como evidencia real),42,300,0.21,1.0,1.0,1.0,1.0,1.0,1.0,150,150,0,0
+CNN,SINTÉTICO (demo: no válido como evidencia real),42,300,0.5,1.0,1.0,1.0,1.0,1.0,1.0,150,150,0,0
