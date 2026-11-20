@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "mongodb": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "mongodb-mcp-server"
+      ],
+      "env": {
+        "MDB_MCP_READ_ONLY": "true",
+        "MDB_MCP_CONNECTION_STRING": "mongodb://localhost:27017/driveguard_lab"
+      }
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
+    }
+  }
+}

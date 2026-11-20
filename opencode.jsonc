@@ -1,0 +1,52 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // V2: ordered rules; the last match wins.
+  "permissions": [
+    // Anything not explicitly allowed below needs confirmation.
+    { "action": "shell", "resource": "*", "effect": "ask" },
+
+    // Routine verification and read-only Git inspection.
+    { "action": "shell", "resource": "python -m pytest *", "effect": "allow" },
+    { "action": "shell", "resource": "pytest *", "effect": "allow" },
+    { "action": "shell", "resource": "git status *", "effect": "allow" },
+    { "action": "shell", "resource": "git diff *", "effect": "allow" },
+    { "action": "shell", "resource": "git log *", "effect": "allow" },
+    { "action": "shell", "resource": "git show *", "effect": "allow" },
+    { "action": "shell", "resource": "git rev-parse *", "effect": "allow" },
+
+    // Confirm installs and commits.
+    { "action": "shell", "resource": "pip install *", "effect": "ask" },
+    { "action": "shell", "resource": "python -m pip install *", "effect": "ask" },
+    { "action": "shell", "resource": "uv pip install *", "effect": "ask" },
+    { "action": "shell", "resource": "conda install *", "effect": "ask" },
+    { "action": "shell", "resource": "git commit *", "effect": "ask" },
+
+    // Hard denials. `.env.example` stays readable as the safe template.
+    { "action": "read", "resource": "*.env", "effect": "deny" },
+    { "action": "read", "resource": "*.env.*", "effect": "deny" },
+    { "action": "edit", "resource": "*.env", "effect": "deny" },
+    { "action": "edit", "resource": "*.env.*", "effect": "deny" },
+    { "action": "read", "resource": "*.env.example", "effect": "allow" },
+    { "action": "edit", "resource": "*.env.example", "effect": "allow" },
+    { "action": "shell", "resource": "git push *", "effect": "deny" },
+    { "action": "shell", "resource": "rm -rf *", "effect": "deny" }
+  ],
+
+  "mcp": {
+    "servers": {
+      "mongodb": {
+        "type": "local",
+        "command": ["cmd", "/c", "mongodb-mcp-server"],
+        "environment": {
+          "MDB_MCP_READ_ONLY": "true",
+          "MDB_MCP_CONNECTION_STRING": "mongodb://localhost:27017/driveguard_lab"
+        }
+      },
+      "playwright": {
+        "type": "local",
+        "command": ["cmd", "/c", "npx", "-y", "@playwright/mcp@latest"]
+      }
+    }
+  }
+}
