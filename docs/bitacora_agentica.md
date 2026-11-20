@@ -55,3 +55,16 @@
   - `sin_respuesta`: escala a `ALTO` a los 21,5 s (22,0 s de cierre continuo, PERCLOS 70 %) y dispara `emergencia` a los 31,5 s tras 10 s sin respuesta.
   - `distraccion`, `cabeceos` y `rostro_ausente`: escalan a `MEDIO` en 23,0 s, 40,5 s (3 cabeceos) y 23,0 s respectivamente.
 - **Validación:** Determinismo comprobado mediante hashes idénticos entre corridas consecutivas y `46 passed` en `pytest`.
+
+## Fase 4: Análisis de sensibilidad de umbrales (`@driveguard-umbrales`)
+
+- **Script implementado:** `scripts/experimentos/sensibilidad_umbrales.py` (ejecutado con `--semilla 42 --fps 15`, aplicando variaciones mediante `ConfigRiesgo.desde_dict()` sin alterar los valores por defecto).
+- **Artefactos generados:** `resultados/sensibilidad_umbrales.csv` (35 combinaciones), `resultados/sensibilidad_umbrales_detalles.csv`, `resultados/sensibilidad_umbrales.md` y `resultados/sensibilidad_umbrales.png` (5 paneles).
+- **Hallazgos por parámetro:**
+  - `factor_ear`: `0.20–0.30` pierden detecciones (`0/2`); el default `0.75` detecta `2/2` en `1.53 s` con `0 s` de falsas alarmas.
+  - `perclos_umbral`: `2–5 %` producen `20 s` de falsas alarmas en `normal` y `50 %` pierde `cansancio` (`0/1`); el default `30 %` logra `1/1` sin falsas alarmas.
+  - `microsueno_s`: `3.0 s` supera el cierre sintético de `2.5 s` (`1/2`); el default `1.5 s` detecta `2/2`.
+  - `sin_respuesta_s`: `25–30 s` no llegan a disparar emergencia (`0/1`); el default `10 s` la activa de forma consistente.
+  - `histeresis_s`: mantiene `2/2` detecciones en todos los valores, pero al subir de `0 s` a `10 s` el retorno a `NORMAL` aumenta de `0.05 s` a `10.05 s`; el default `2 s` equilibra estabilidad y tiempo de recuperación.
+- **Verificación visual humana (`sensibilidad_umbrales.png`):** Gráfica legible sin etiquetas solapadas; los 5 valores por defecto se ubican en la zona de 100 % detecciones y 0 s de falsas alarmas. Se observó únicamente que la leyenda muestra `Default` en gris punteado mientras la línea vertical es verde discontinua, y que el eje X de PERCLOS expresa el porcentaje como proporción (`0.0–0.5`).
+- **Decisión y validación:** Se conservan los cinco valores por defecto de `ConfigRiesgo`. Suite `pytest` en verde (`46 passed`).
