@@ -32,3 +32,8 @@
 ### 5. Verificación humana y control de alucinaciones
 - **Archivos contrastados:** `core/riesgo.py`, `core/alarma.py`, `frontend/monitoreo_ui.py`.
 - **Resultado:** Todas las funciones, clases y números de línea citados por OpenCode coincidieron exactamente con el código real. Se detectaron únicamente dos erratas menores de redacción en la respuesta del modelo (`概率 > 0.5` y `reglas earning`), sin impacto en las rutas ni en los nombres de funciones verificados.
+
+### 6. Incidencias y soluciones aplicadas durante la Fase 1
+- **Elección de consola agéntica:** Al requerirse suscripción de pago para usar Claude Code, se optó por **OpenCode** con los modelos gratuitos de Zen, manteniendo compatibilidad para ambas herramientas (`AGENTS.md` + `CLAUDE.md` y carpetas `.claude/` + `.opencode/`).
+- **Registro de servidores MCP en Windows:** En `claude mcp add` fue necesario colocar `--scope project` antes del nombre del servidor para delimitar las variables de entorno y envolver `npx` con `cmd /c`.
+- **Error de módulo en `mongodb-mcp-server`:** Al probar la conexión MCP de MongoDB, `npx` falló con `ERR_MODULE_NOT_FOUND` por una referencia rota a `.esm-wrapper.mjs`. Se solucionó eliminando la caché temporal `_npx`, instalando `mongodb-mcp-server` de forma global con `npm install -g`, corrigiendo la importación a `index.js` en `keychain.js` y apuntando `opencode.jsonc` directamente al ejecutable global.
