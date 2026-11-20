@@ -38,12 +38,20 @@
 - **Registro de servidores MCP en Windows:** En `claude mcp add` fue necesario colocar `--scope project` antes del nombre del servidor para delimitar las variables de entorno y envolver `npx` con `cmd /c`.
 - **Error de módulo en `mongodb-mcp-server`:** Al probar la conexión MCP de MongoDB, `npx` falló con `ERR_MODULE_NOT_FOUND` por una referencia rota a `.esm-wrapper.mjs`. Se solucionó eliminando la caché temporal `_npx`, instalando `mongodb-mcp-server` de forma global con `npm install -g`, corrigiendo la importación a `index.js` en `keychain.js` y apuntando `opencode.jsonc` directamente al ejecutable global.
 
-@'
-
----
-
 ## Fase 2: Verificación del entorno
 
 - **Script implementado:** `scripts/verificar_entorno.py` mediante la skill `@driveguard-verificar-entorno`.
 - **Resultado del diagnóstico:** `10 OK | 3 avisos | 0 errores` (Python 3.11.18, `mediapipe 1.2.3`, `cv2 5.1.0`, `fastapi 0.165.0`, `streamlit 1.67.0`, `torch 2.15.0+cpu`, modelo `face_landmark.task` presente, sonidos WAV generados, puerto TCP `27017` de MongoDB abierto y `46 passed` en `pytest`).
 - **Avisos revisados:** Uso de `.venv` en lugar de `conda`, omisión intencional de lectura de `.env` por seguridad y API FastAPI aún sin iniciar en el puerto `8000`.
+
+## Fase 3: Experimentos con escenarios sintéticos (`@driveguard-escenarios`)
+
+- **Script implementado:** `scripts/experimentos/escenarios_sinteticos.py` (ejecutado con `--semilla 42` y `--fps 15`, reutilizando `core.simulacion` y `core.riesgo` sin alterar `ConfigRiesgo`).
+- **Artefactos generados:** `resultados/escenarios_sinteticos.csv` (5.850 registros por fotograma) y `resultados/escenarios_sinteticos.md`.
+- **Resultados verificados (`[OK]` en los 7 escenarios):**
+  - `normal`: se mantiene en `NORMAL` durante los 60 s (cierre máximo 0,27 s, PERCLOS 11 %), sin alertas.
+  - `cansancio`: escala a `MEDIO` a los 40,0 s (PERCLOS máximo 45 %, 3 bostezos).
+  - `microsueno`: escala a `ALTO` a los 21,5 s por 2,5 s de ojos cerrados continuos, sin emergencia.
+  - `sin_respuesta`: escala a `ALTO` a los 21,5 s (22,0 s de cierre continuo, PERCLOS 70 %) y dispara `emergencia` a los 31,5 s tras 10 s sin respuesta.
+  - `distraccion`, `cabeceos` y `rostro_ausente`: escalan a `MEDIO` en 23,0 s, 40,5 s (3 cabeceos) y 23,0 s respectivamente.
+- **Validación:** Determinismo comprobado mediante hashes idénticos entre corridas consecutivas y `46 passed` en `pytest`.
