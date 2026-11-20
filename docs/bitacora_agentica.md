@@ -68,3 +68,15 @@
   - `histeresis_s`: mantiene `2/2` detecciones en todos los valores, pero al subir de `0 s` a `10 s` el retorno a `NORMAL` aumenta de `0.05 s` a `10.05 s`; el default `2 s` equilibra estabilidad y tiempo de recuperación.
 - **Verificación visual humana (`sensibilidad_umbrales.png`):** Gráfica legible sin etiquetas solapadas; los 5 valores por defecto se ubican en la zona de 100 % detecciones y 0 s de falsas alarmas. Se observó únicamente que la leyenda muestra `Default` en gris punteado mientras la línea vertical es verde discontinua, y que el eje X de PERCLOS expresa el porcentaje como proporción (`0.0–0.5`).
 - **Decisión y validación:** Se conservan los cinco valores por defecto de `ConfigRiesgo`. Suite `pytest` en verde (`46 passed`).
+
+## Fase 5: Evaluación sobre video (`@driveguard-video`)
+
+- **Script implementado:** `scripts/experimentos/evaluacion_video.py` (ejecutado sobre un clip sintético de 50,0 s / 750 fotogramas a 15 fps guardado localmente en `data/videos/` e ignorado por Git).
+- **Enfoque técnico:** MediaPipe `FaceLandmarker` procesó los 750 fotogramas reales para medir latencia de inferencia, mientras que EAR/MAR se inyectaron con semilla fija para reproducir eventos controlados sin alterar `core/riesgo.py` ni `ConfigRiesgo`.
+- **Artefactos generados:** `resultados/evaluacion_video_fotogramas.csv`, `resultados/evaluacion_video_resumen.csv`, `resultados/evaluacion_video.md` y `resultados/evaluacion_video.png`.
+- **Rendimiento medido:**
+  - Tiempo total: `15,34 s` | FPS de flujo: `48,9 FPS` | FPS de procesamiento: `53,7 FPS`.
+  - Latencia total: media `18,6 ms`, p50 `19,1 ms`, p95 `26,2 ms`, máxima `59,4 ms` (latencia media de MediaPipe: `17,5 ms`).
+- **Detecciones registradas:** `microsueno` a los `17,53 s` (`ALTO`, 3,6 s), `bostezos` a los `38,00 s` (`MEDIO`, 12,0 s) y `rostro_ausente` a los `44,00 s` (`MEDIO`, 3,0 s). Nivel máximo `ALTO`, sin emergencia.
+- **Verificación visual humana (`evaluacion_video.png`):** Gráfica libre de rostros; muestra con claridad el ajuste del umbral EAR tras la calibración de 10 s, la transición a `ALTO` en el microsueño, los 3 picos de MAR y el estado `MEDIO` durante bostezos y ausencia de rostro, además de la distribución de latencia (`p50 = 19,1 ms`, `p95 = 26,2 ms`). Se observó que los tres paneles comparten el eje X (`0–60`) combinando segundos arriba y milisegundos en el histograma inferior.
+- **Validación:** Verificado con `git check-ignore` que ningún `.mp4` entra al repositorio; `pytest` en verde (`46 passed`).
