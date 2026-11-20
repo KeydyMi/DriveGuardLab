@@ -37,3 +37,13 @@
 - **Elección de consola agéntica:** Al requerirse suscripción de pago para usar Claude Code, se optó por **OpenCode** con los modelos gratuitos de Zen, manteniendo compatibilidad para ambas herramientas (`AGENTS.md` + `CLAUDE.md` y carpetas `.claude/` + `.opencode/`).
 - **Registro de servidores MCP en Windows:** En `claude mcp add` fue necesario colocar `--scope project` antes del nombre del servidor para delimitar las variables de entorno y envolver `npx` con `cmd /c`.
 - **Error de módulo en `mongodb-mcp-server`:** Al probar la conexión MCP de MongoDB, `npx` falló con `ERR_MODULE_NOT_FOUND` por una referencia rota a `.esm-wrapper.mjs`. Se solucionó eliminando la caché temporal `_npx`, instalando `mongodb-mcp-server` de forma global con `npm install -g`, corrigiendo la importación a `index.js` en `keychain.js` y apuntando `opencode.jsonc` directamente al ejecutable global.
+
+@'
+
+---
+
+## Fase 2: Verificación del entorno
+
+- **Script implementado:** `scripts/verificar_entorno.py` mediante la skill `@driveguard-verificar-entorno`.
+- **Resultado del diagnóstico:** `10 OK | 3 avisos | 0 errores` (Python 3.11.18, `mediapipe 1.2.3`, `cv2 5.1.0`, `fastapi 0.165.0`, `streamlit 1.67.0`, `torch 2.15.0+cpu`, modelo `face_landmark.task` presente, sonidos WAV generados, puerto TCP `27017` de MongoDB abierto y `46 passed` en `pytest`).
+- **Avisos revisados:** Uso de `.venv` en lugar de `conda`, omisión intencional de lectura de `.env` por seguridad y API FastAPI aún sin iniciar en el puerto `8000`.
